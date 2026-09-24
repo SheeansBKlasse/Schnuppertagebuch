@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Schnuppertagebuch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+
+    --paper:#F2EEE1;
+    --paper-raised:#FBF9F2;
+    --ink:#26332B;
+    --ink-soft:#5B6A5C;
+    --moss:#3F5C43;
+    --moss-dark:#2E4632;
+    --navy:#2C3A55;
+    --stamp:#B33F32;
+    --line:#CCC4A9;
+    --shadow:rgba(38,51,43,0.14);
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --paper:#1B221C;
+      --paper-raised:#232B23;
+      --ink:#ECE7D8;
+      --ink-soft:#A7AF9C;
+      --moss:#82A87E;
+      --moss-dark:#9DC198;
+      --navy:#93A8CF;
+      --stamp:#E08E7C;
+      --line:#3A4536;
+      --shadow:rgba(0,0,0,0.45);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1B221C;
+    --paper-raised:#232B23;
+    --ink:#ECE7D8;
+    --ink-soft:#A7AF9C;
+    --moss:#82A87E;
+    --moss-dark:#9DC198;
+    --navy:#93A8CF;
+    --stamp:#E08E7C;
+    --line:#3A4536;
+    --shadow:rgba(0,0,0,0.45);
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.serif{font-family:'Fraunces', Georgia, serif;}
+
+  a{color:var(--navy);}
+
+  /* ---------- Header ---------- */
+  header.top{
+    max-width:920px;
+    margin:0 auto;
+    padding:2.6rem 1.5rem 1.2rem;
+  }
+  header.top h1{
+    font-size:clamp(2rem, 5vw, 2.7rem);
+    font-weight:600;
+    margin:0 0 .3rem;
+    letter-spacing:-0.01em;
+  }
+  .flourish{width:150px;height:10px;margin-bottom:.9rem;}
+  .flourish path{fill:none;stroke:var(--moss);stroke-width:2;stroke-linecap:round;}
+  header.top p{
+    margin:0;
+    max-width:52ch;
+    color:var(--ink-soft);
+    font-size:1.02rem;
+  }
+  .progress-line{
+    margin-top:1rem;
+    display:flex;
+    align-items:center;
+    gap:.6rem;
+    font-size:.92rem;
+    color:var(--ink-soft);
+  }
+  .progress-dots{display:flex;gap:.35rem;}
+  .progress-dots span{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--line);
+    display:inline-block;
+  }
+  .progress-dots span.done{background:var(--moss);}
+
+  /* ---------- Layout ---------- */
+  .layout{
+    max-width:920px;
+    margin:0 auto;
+    padding:0 1.5rem 4rem;
+    display:grid;
+    grid-template-columns:190px 1fr;
+    gap:1.8rem;
+    align-items:start;
+  }
+  @media (max-width:760px){
+    .layout{grid-template-columns:1fr; padding:0 1rem 3rem;}
+  }
+
+  /* ---------- Tabs (logbook dividers) ---------- */
+  nav.tabs{
+    display:flex;
+    flex-direction:column;
+    gap:.5rem;
+    position:sticky;
+    top:calc(1.2rem + env(safe-area-inset-top,0px));
+  }
+  @media (max-width:760px){
+    nav.tabs{
+      flex-direction:row;
+      overflow-x:auto;
+      position:sticky;
+      top:env(safe-area-inset-top,0px);
+      background:var(--paper);
+      padding:.6rem 0;
+      z-index:5;
+      -webkit-overflow-scrolling:touch;
+      gap:.5rem;
+    }
+  }
+  .tab{
+    display:flex;
+    align-items:center;
+    gap:.55rem;
+    text-align:left;
+    background:transparent;
+    border:1px solid var(--line);
+    border-right:none;
+    color:var(--ink-soft);
+    font-family:'Public Sans', sans-serif;
+    font-size:.95rem;
+    font-weight:500;
+    padding:.65rem .9rem;
+    border-radius:8px 0 0 8px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:transform .15s ease, background .15s ease, color .15s ease;
+  }
+  @media (max-width:760px){
+    .tab{border-radius:8px; border-right:1px solid var(--line); flex:0 0 auto;}
+  }
+  .tab:hover{transform:translateX(2px);}
+  @media (max-width:760px){ .tab:hover{transform:none;} }
+  .tab.active{
+    background:var(--paper-raised);
+    color:var(--ink);
+    border-color:var(--moss);
+    font-weight:600;
+    box-shadow:-3px 3px 0 var(--shadow);
+  }
+  .tab .stamp-dot{
+    width:9px;height:9px;border-radius:50%;
+    border:1.4px solid var(--line);
+    flex:0 0 auto;
+  }
+  .tab .stamp-dot.done{background:var(--moss); border-color:var(--moss);}
+  .tab:focus-visible{outline:2px solid var(--moss); outline-offset:2px;}
+
+  /* ---------- Page / content card ---------- */
+  .page{display:none;}
+  .page.active{display:block; animation:settle .25s ease;}
+  @keyframes settle{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+  @media (prefers-reduced-motion: reduce){ .page.active{animation:none;} .tab{transition:none;} }
+
+  .card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:1.8rem 1.8rem 1.6rem;
+  }
+  @media (max-width:480px){ .card{padding:1.3rem 1.1rem;} }
+
+  .card h2{
+    margin:0 0 .3rem;
+    font-size:1.5rem;
+    font-weight:600;
+  }
+  .card > .lede{
+    margin:0 0 1.6rem;
+    color:var(--ink-soft);
+    font-size:.96rem;
+    max-width:56ch;
+  }
+
+  .field{margin-bottom:1.5rem;}
+  .field label{
+    display:block;
+    font-family:'Fraunces', Georgia, serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:1.02rem;
+    margin-bottom:.4rem;
+    color:var(--ink);
+  }
+  .field .hint{
+    display:block;
+    font-family:'Public Sans', sans-serif;
+    font-style:normal;
+    font-size:.85rem;
+    color:var(--ink-soft);
+    margin-top:-.2rem;
+    margin-bottom:.5rem;
+  }
+  input[type="text"], textarea{
+    width:100%;
+    font:inherit;
+    font-family:'Public Sans', sans-serif;
+    color:var(--ink);
+    background:transparent;
+    border:none;
+    border-bottom:1.5px solid var(--line);
+    padding:.5rem .1rem;
+    resize:vertical;
+    min-height:2.6rem;
+  }
+  textarea{min-height:5rem;}
+  input[type="text"]:focus, textarea:focus{
+    outline:none;
+    border-bottom-color:var(--moss);
+  }
+  input[type="text"]:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--moss);
+    outline-offset:3px;
+    border-radius:2px;
+  }
+
+  fieldset{border:none; margin:0 0 1.5rem; padding:0;}
+  fieldset > legend{
+    font-family:'Fraunces', Georgia, serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:1.02rem;
+    padding:0;
+    margin-bottom:.6rem;
+  }
+  .subgrid{display:grid; gap:1.1rem;}
+
+  .interview-card, .opinion-card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:1.2rem 1.2rem .6rem;
+    margin-bottom:1.6rem;
+  }
+
+  /* multiple choice */
+  .choices{display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.3rem;}
+  .choice{
+    display:flex;
+    align-items:center;
+    gap:.65rem;
+    cursor:pointer;
+    padding:.15rem 0;
+  }
+  .choice input{position:absolute; opacity:0; width:1px; height:1px;}
+  .choice-mark{
+    width:19px;height:19px;
+    border-radius:50%;
+    border:1.5px solid var(--line);
+    position:relative;
+    flex:0 0 auto;
+    background:var(--paper-raised);
+  }
+  .choice input:checked + .choice-mark{border-color:var(--moss);}
+  .choice input:checked + .choice-mark::after{
+    content:"";
+    position:absolute; inset:4px;
+    background:var(--moss);
+    border-radius:50%;
+  }
+  .choice input:focus-visible + .choice-mark{outline:2px solid var(--moss); outline-offset:2px;}
+  .choice-text{font-size:.98rem;}
+
+  /* photo uploader */
+  .photo-zone{
+    border:1.5px dashed var(--line);
+    border-radius:10px;
+    padding:1.2rem;
+    text-align:center;
+    color:var(--ink-soft);
+    cursor:pointer;
+    background:var(--paper);
+  }
+  .photo-zone:hover{border-color:var(--moss);}
+  .photo-zone input{display:none;}
+  .photo-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:1rem;
+    margin-top:1rem;
+  }
+  .photo-item{
+    position:relative;
+    width:130px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:.4rem .4rem .5rem;
+    box-shadow:2px 3px 0 var(--shadow);
+  }
+  .photo-item:nth-child(odd){transform:rotate(-1.4deg);}
+  .photo-item:nth-child(even){transform:rotate(1.2deg);}
+  .photo-item img{width:100%; height:95px; object-fit:cover; display:block; border-radius:2px;}
+  .photo-remove{
+    position:absolute; top:-8px; right:-8px;
+    width:24px; height:24px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--paper-raised);
+    color:var(--stamp);
+    font-size:.85rem;
+    line-height:1;
+    cursor:pointer;
+  }
+  .photo-remove:focus-visible{outline:2px solid var(--stamp);}
+
+  /* nav buttons */
+  .page-nav{
+    display:flex;
+    justify-content:space-between;
+    margin-top:1.6rem;
+    gap:1rem;
+  }
+  button{font-family:inherit; cursor:pointer;}
+  .btn{
+    border:1.4px solid var(--moss);
+    background:transparent;
+    color:var(--moss-dark);
+    padding:.6rem 1.1rem;
+    border-radius:7px;
+    font-size:.92rem;
+    font-weight:600;
+  }
+  .btn:hover{background:var(--moss); color:var(--paper-raised);}
+  .btn:disabled{opacity:.35; cursor:default; background:transparent; color:var(--moss-dark);}
+  .btn.primary{background:var(--moss); color:var(--paper-raised);}
+  .btn.primary:hover{background:var(--moss-dark);}
+  .btn:focus-visible{outline:2px solid var(--moss); outline-offset:2px;}
+
+  /* footer toolbar */
+  footer.toolbar{
+    max-width:920px;
+    margin:0 auto;
+    padding:1rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom,0px));
+    display:flex;
+    flex-wrap:wrap;
+    gap:.6rem 1.2rem;
+    align-items:center;
+    justify-content:space-between;
+    border-top:1px solid var(--line);
+    font-size:.88rem;
+    color:var(--ink-soft);
+  }
+  .toolbar .actions{display:flex; gap:.6rem; flex-wrap:wrap;}
+  .link-btn{
+    background:none; border:none; color:var(--navy);
+    font-size:.88rem; text-decoration:underline;
+    padding:.2rem 0;
+  }
+  .link-btn.danger{color:var(--stamp);}
+
+  #printArea{display:none;}
+
+  @media print{
+    header.top, nav.tabs, footer.toolbar, .page-nav{display:none !important;}
+    .layout{display:block; grid-template-columns:none;}
+    .page{display:none !important;}
+    body{background:#fff; color:#111;}
+    #printArea{
+      display:block;
+      max-width:100%;
+      padding:0 .3in;
+      font-family:'Public Sans', sans-serif;
+    }
+    #printArea h1{font-family:'Fraunces', serif; font-size:1.6rem; margin-bottom:.2rem;}
+    #printArea h2{font-family:'Fraunces', serif; font-size:1.25rem; margin:1.4rem 0 .5rem; break-before:page;}
+    #printArea h2:first-of-type{break-before:auto;}
+    #printArea .p-field{margin-bottom:.7rem;}
+    #printArea .p-label{font-style:italic; font-weight:600; font-size:.92rem;}
+    #printArea .p-value{white-space:pre-wrap; font-size:.92rem; margin:.15rem 0 0;}
+    #printArea .p-photos{display:flex; gap:8px; flex-wrap:wrap; margin-top:.4rem;}
+    #printArea .p-photos img{width:110px; height:85px; object-fit:cover; border:1px solid #999;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Schnuppertagebuch</h1>
+  <svg class="flourish" viewBox="0 0 150 10" aria-hidden="true"><path d="M2 7 Q 20 1, 38 6 T 74 5 T 110 6 T 148 4"/></svg>
+  <p>Dein Logbuch für die Schnupperlehre – von der Vorbereitung bis zur Auswertung. Alles, was du hier einträgst, wird automatisch in diesem Browser gespeichert.</p>
+  <div class="progress-line">
+    <div class="progress-dots" id="progressDots"></div>
+    <span id="progressText">0 von 5 Abschnitten begonnen</span>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="tabs" id="tabs" aria-label="Abschnitte"></nav>
+  <main id="pages"></main>
+</div>
+
+<footer class="toolbar">
+  <span id="saveStatus">Noch nichts gespeichert.</span>
+  <div class="actions">
+    <button class="link-btn" id="btnPrint" type="button">Drucken / als PDF sichern</button>
+    <button class="link-btn" id="btnExport" type="button">Sichern als Datei</button>
+    <button class="link-btn" id="btnSubmit" type="button" style="font-weight:600;">Einreichen</button>
+    <label class="link-btn" style="cursor:pointer;">Datei laden<input type="file" id="importFile" accept="application/json" style="display:none;"></label>
+    <button class="link-btn danger" id="btnReset" type="button">Zurücksetzen</button>
+  </div>
+</footer>
+
+<div id="printArea"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = "schnuppertagebuch-v1";
+
+  var emptyDay = function(){ return {dabei:"", gefallen:"", selbst:"", nichtToll:"", muehe:"", fotos:[]}; };
+
+  var defaultData = function(){
+    return {
+      vorbereitung:{
+        meinName:"",
+        betriebe:[
+          {betrieb:"", adresse:"", telefon:"", beruf:""},
+          {betrieb:"", adresse:"", telefon:"", beruf:""},
+          {betrieb:"", adresse:"", telefon:"", beruf:""},
+          {betrieb:"", adresse:"", telefon:"", beruf:""},
+          {betrieb:"", adresse:"", telefon:"", beruf:""}
+        ],
+        anfang:"", mitnehmen:"", recherche:""
+      },
+      tag1: emptyDay(),
+      tag2: emptyDay(),
+      tag3: emptyDay(),
+      auswertung:{
+        interview:{ name:"", alter:"", funktion:"", dauer:"", magArbeit:"", magBetrieb:"", liebste:"", ungern:"" },
+        meinung:{ interesse:"", faehigkeiten:"", team:"" },
+        naechster:""
+      }
+    };
+  };
+
+  var data = defaultData();
+
+  function emptyBetrieb(){ return {betrieb:"", adresse:"", telefon:"", beruf:""}; }
+
+  function normalizeVorbereitung(parsedV){
+    parsedV = parsedV || {};
+    var v = Object.assign({}, defaultData().vorbereitung);
+    v.meinName = parsedV.meinName || "";
+    v.anfang = parsedV.anfang || "";
+    v.mitnehmen = parsedV.mitnehmen || "";
+    v.recherche = parsedV.recherche || "";
+    var betriebe = [];
+    if(Array.isArray(parsedV.betriebe)){
+      for(var i=0;i<5;i++){ betriebe.push(Object.assign(emptyBetrieb(), parsedV.betriebe[i]||{})); }
+    } else {
+      // Migration eines alten Speicherstands mit nur einem Betrieb
+      betriebe.push(Object.assign(emptyBetrieb(), {
+        betrieb: parsedV.betrieb||"", adresse: parsedV.adresse||"",
+        telefon: parsedV.telefon||"", beruf: parsedV.beruf||""
+      }));
+      for(var j=1;j<5;j++){ betriebe.push(emptyBetrieb()); }
+    }
+    v.betriebe = betriebe;
+    return v;
+  }
+
+  function loadData(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        var parsed = JSON.parse(raw);
+        data = Object.assign(defaultData(), parsed);
+        // ensure nested defaults exist even if an old/partial save is loaded
+        ["tag1","tag2","tag3"].forEach(function(k){ data[k] = Object.assign(emptyDay(), parsed[k]||{}); });
+        data.vorbereitung = normalizeVorbereitung(parsed.vorbereitung);
+        var av = defaultData().auswertung;
+        data.auswertung = {
+          interview: Object.assign(av.interview, (parsed.auswertung||{}).interview||{}),
+          meinung: Object.assign(av.meinung, (parsed.auswertung||{}).meinung||{}),
+          naechster: (parsed.auswertung||{}).naechster || ""
+        };
+      }
+    }catch(e){ console.error("Konnte gespeicherte Daten nicht laden:", e); }
+  }
+
+  var saveTimer = null;
+  function saveData(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        var el = document.getElementById("saveStatus");
+        var now = new Date();
+        el.textContent = "Gespeichert um " + now.toLocaleTimeString("de-CH",{hour:"2-digit",minute:"2-digit"});
+        updateProgress();
+      }catch(e){
+        document.getElementById("saveStatus").textContent = "Speichern fehlgeschlagen – vermutlich ist der Speicher voll (z. B. zu viele Fotos).";
+        console.error(e);
+      }
+    }, 350);
+  }
+
+  loadData();
+
+  // ---------- Section definitions ----------
+  var sections = [
+    {id:"vorbereitung", label:"Vorbereitung"},
+    {id:"tag1", label:"Tag 1"},
+    {id:"tag2", label:"Tag 2"},
+    {id:"tag3", label:"Tag 3"},
+    {id:"auswertung", label:"Auswertung"}
+  ];
+  var currentIndex = 0;
+
+  function sectionHasContent(id){
+    if(id==="vorbereitung"){
+      var v = data.vorbereitung;
+      var anyBetrieb = (v.betriebe||[]).some(function(b){ return b.betrieb||b.adresse||b.telefon||b.beruf; });
+      return !!(v.meinName||anyBetrieb||v.anfang||v.mitnehmen||v.recherche);
+    }
+    if(id==="tag1"||id==="tag2"||id==="tag3"){
+      var d = data[id];
+      return !!(d.dabei||d.gefallen||d.selbst||d.nichtToll||d.muehe||(d.fotos&&d.fotos.length));
+    }
+    if(id==="auswertung"){
+      var a = data.auswertung;
+      var iv = a.interview, m = a.meinung;
+      return !!(iv.name||iv.alter||iv.funktion||iv.dauer||iv.magArbeit||iv.magBetrieb||iv.liebste||iv.ungern||m.interesse||m.faehigkeiten||m.team||a.naechster);
+    }
+    return false;
+  }
+
+  function updateProgress(){
+    var dots = document.getElementById("progressDots");
+    dots.innerHTML = "";
+    var count = 0;
+    sections.forEach(function(s){
+      var has = sectionHasContent(s.id);
+      if(has) count++;
+      var dot = document.createElement("span");
+      if(has) dot.className = "done";
+      dots.appendChild(dot);
+
+      var tabDot = document.querySelector('.tab[data-id="'+s.id+'"] .stamp-dot');
+      if(tabDot) tabDot.classList.toggle("done", has);
+    });
+    document.getElementById("progressText").textContent = count + " von " + sections.length + " Abschnitten begonnen";
+  }
+
+  // ---------- Rendering ----------
+  function el(tag, attrs, children){
+    var e = document.createElement(tag);
+    attrs = attrs || {};
+    Object.keys(attrs).forEach(function(k){
+      if(k==="class") e.className = attrs[k];
+      else if(k==="text") e.textContent = attrs[k];
+      else if(k==="html") e.innerHTML = attrs[k];
+      else e.setAttribute(k, attrs[k]);
+    });
+    (children||[]).forEach(function(c){ if(c) e.appendChild(c); });
+    return e;
+  }
+
+  function fieldTextarea(labelText, hint, value, onInput){
+    var wrap = el("div", {class:"field"});
+    wrap.appendChild(el("label", {text:labelText}));
+    if(hint) wrap.appendChild(el("span", {class:"hint", text:hint}));
+    var ta = el("textarea");
+    ta.value = value || "";
+    ta.addEventListener("input", function(){ onInput(ta.value); saveData(); });
+    wrap.appendChild(ta);
+    return wrap;
+  }
+
+  function fieldInput(labelText, value, onInput){
+    var wrap = el("div", {class:"field"});
+    wrap.appendChild(el("label", {text:labelText}));
+    var inp = el("input", {type:"text"});
+    inp.value = value || "";
+    inp.addEventListener("input", function(){ onInput(inp.value); saveData(); });
+    wrap.appendChild(inp);
+    return wrap;
+  }
+
+  function compressImage(file){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(e){
+        var img = new Image();
+        img.onload = function(){
+          var maxW = 1000;
+          var scale = Math.min(1, maxW / img.width);
+          var w = Math.max(1, Math.round(img.width * scale));
+          var h = Math.max(1, Math.round(img.height * scale));
+          var canvas = document.createElement("canvas");
+          canvas.width = w; canvas.height = h;
+          var ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", 0.72));
+        };
+        img.onerror = function(){ reject(new Error("Bild konnte nicht gelesen werden.")); };
+        img.src = e.target.result;
+      };
+      reader.onerror = function(){ reject(new Error("Datei konnte nicht gelesen werden.")); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function photoField(dayKey){
+    var wrap = el("div", {class:"field"});
+    wrap.appendChild(el("label", {text:"Fotos"}));
+    wrap.appendChild(el("span", {class:"hint", text:"Lade Fotos von deinem Tag hoch, z. B. vom Arbeitsplatz oder von dir bei der Arbeit."}));
+
+    var zone = el("label", {class:"photo-zone", text:"Fotos auswählen oder hierher ziehen"});
+    var input = el("input", {type:"file", accept:"image/*", multiple:"multiple"});
+    zone.appendChild(input);
+    wrap.appendChild(zone);
+
+    var grid = el("div", {class:"photo-grid"});
+    wrap.appendChild(grid);
+
+    function renderGrid(){
+      grid.innerHTML = "";
+      (data[dayKey].fotos || []).forEach(function(src, idx){
+        var item = el("div", {class:"photo-item"});
+        var img = el("img", {src:src, alt:"Foto " + (idx+1)});
+        var rm = el("button", {type:"button", class:"photo-remove", "aria-label":"Foto entfernen", text:"×"});
+        rm.addEventListener("click", function(){
+          data[dayKey].fotos.splice(idx,1);
+          saveData();
+          renderGrid();
+        });
+        item.appendChild(img);
+        item.appendChild(rm);
+        grid.appendChild(item);
+      });
+    }
+    renderGrid();
+
+    input.addEventListener("change", function(){
+      var files = Array.prototype.slice.call(input.files || []);
+      Promise.all(files.map(compressImage)).then(function(dataUrls){
+        data[dayKey].fotos = (data[dayKey].fotos || []).concat(dataUrls);
+        saveData();
+        renderGrid();
+      }).catch(function(err){
+        console.error(err);
+        alert("Mindestens ein Foto konnte nicht verarbeitet werden.");
+      });
+      input.value = "";
+    });
+
+    return wrap;
+  }
+
+  function buildVorbereitung(){
+    var card = el("div", {class:"card"});
+    card.appendChild(el("h2", {text:"Vorbereitung"}));
+    card.appendChild(el("p", {class:"lede", text:"Bevor es losgeht: Halte hier die wichtigsten Angaben zu deinem Schnupperbetrieb fest."}));
+
+    var v = data.vorbereitung;
+    card.appendChild(fieldInput("Mein Name", v.meinName, function(val){ v.meinName = val; }));
+
+    var betriebeWrap = el("fieldset");
+    betriebeWrap.appendChild(el("legend", {text:"Meine Schnuppereinsätze"}));
+    betriebeWrap.appendChild(el("span", {class:"hint", text:"Für jeden Schnuppertag ein neuer Betrieb – trage hier bis zu fünf Einsätze ein."}));
+    v.betriebe.forEach(function(b, i){
+      var block = el("div", {class:"interview-card"});
+      block.appendChild(el("h3", {class:"serif", text:"Schnuppereinsatz " + (i+1), style:"font-size:1.05rem;font-style:italic;font-weight:500;margin:0 0 .8rem;"}));
+      block.appendChild(fieldInput("Name des Betriebs", b.betrieb, function(val){ b.betrieb = val; }));
+      block.appendChild(fieldInput("Adresse", b.adresse, function(val){ b.adresse = val; }));
+      block.appendChild(fieldInput("Telefonnummer des Betriebes", b.telefon, function(val){ b.telefon = val; }));
+      block.appendChild(fieldInput("Name des Berufes", b.beruf, function(val){ b.beruf = val; }));
+      betriebeWrap.appendChild(block);
+    });
+    card.appendChild(betriebeWrap);
+
+    var org = el("fieldset");
+    org.appendChild(el("legend", {text:"Organisatorisches"}));
+    var orgGrid = el("div", {class:"subgrid"});
+    orgGrid.appendChild(fieldInput("Wann fange ich an?", v.anfang, function(val){ v.anfang = val; }));
+    orgGrid.appendChild(fieldInput("Was muss ich mitnehmen?", v.mitnehmen, function(val){ v.mitnehmen = val; }));
+    org.appendChild(orgGrid);
+    card.appendChild(org);
+
+    card.appendChild(fieldTextarea("Recherchen zum Betrieb", "Was weisst du schon über den Betrieb? Was hast du herausgefunden?", v.recherche, function(val){ v.recherche = val; }));
+
+    card.appendChild(buildPageNav("vorbereitung"));
+    return card;
+  }
+
+  function buildTag(dayKey, dayLabel){
+    var card = el("div", {class:"card"});
+    card.appendChild(el("h2", {text:dayLabel}));
+    card.appendChild(el("p", {class:"lede", text:"Halte fest, was du an diesem Tag erlebt hast."}));
+
+    var d = data[dayKey];
+    card.appendChild(fieldTextarea("Bei diesen Arbeiten war ich dabei:", null, d.dabei, function(val){ d.dabei = val; }));
+    card.appendChild(fieldTextarea("Das hat mir gefallen", null, d.gefallen, function(val){ d.gefallen = val; }));
+    card.appendChild(fieldTextarea("Diese Arbeiten durfte ich selber erledigen:", null, d.selbst, function(val){ d.selbst = val; }));
+    card.appendChild(fieldTextarea("Das war nicht so toll:", null, d.nichtToll, function(val){ d.nichtToll = val; }));
+    card.appendChild(fieldTextarea("Das hat mir Mühe bereitet:", null, d.muehe, function(val){ d.muehe = val; }));
+    card.appendChild(photoField(dayKey));
+
+    card.appendChild(buildPageNav(dayKey));
+    return card;
+  }
+
+  function choiceGroup(name, question, options, currentValue, onChange){
+    var fs = el("fieldset");
+    fs.appendChild(el("legend", {text:question}));
+    var group = el("div", {class:"choices"});
+    options.forEach(function(opt){
+      var label = el("label", {class:"choice"});
+      var input = el("input", {type:"radio", name:name});
+      if(currentValue === opt) input.checked = true;
+      input.addEventListener("change", function(){ onChange(opt); saveData(); });
+      label.appendChild(input);
+      label.appendChild(el("span", {class:"choice-mark"}));
+      label.appendChild(el("span", {class:"choice-text", text:opt}));
+      group.appendChild(label);
+    });
+    fs.appendChild(group);
+    return fs;
+  }
+
+  function buildAuswertung(){
+    var card = el("div", {class:"card"});
+    card.appendChild(el("h2", {text:"Auswertung"}));
+    card.appendChild(el("p", {class:"lede", text:"Blicke zurück: Was hast du erfahren, und was hat dich dieser Einblick über dich selbst gelehrt?"}));
+
+    var a = data.auswertung, iv = a.interview, m = a.meinung;
+
+    var ivWrap = el("fieldset");
+    ivWrap.appendChild(el("legend", {text:"Interview mit einem Kollegen"}));
+    var ivCard = el("div", {class:"interview-card"});
+    ivCard.appendChild(fieldInput("Name:", iv.name, function(val){ iv.name = val; }));
+    ivCard.appendChild(fieldInput("Alter:", iv.alter, function(val){ iv.alter = val; }));
+    ivCard.appendChild(fieldInput("Funktion im Betrieb:", iv.funktion, function(val){ iv.funktion = val; }));
+    ivCard.appendChild(fieldInput("Wie lange arbeitest du schon hier?", iv.dauer, function(val){ iv.dauer = val; }));
+    ivCard.appendChild(fieldTextarea("Was gefällt dir an der Arbeit?", null, iv.magArbeit, function(val){ iv.magArbeit = val; }));
+    ivCard.appendChild(fieldTextarea("Was gefällt dir am Betrieb?", null, iv.magBetrieb, function(val){ iv.magBetrieb = val; }));
+    ivCard.appendChild(fieldTextarea("Welche Arbeit machst du am liebsten?", null, iv.liebste, function(val){ iv.liebste = val; }));
+    ivCard.appendChild(fieldTextarea("Welche Arbeit machst du nicht so gerne?", null, iv.ungern, function(val){ iv.ungern = val; }));
+    ivWrap.appendChild(ivCard);
+    card.appendChild(ivWrap);
+
+    var meinungWrap = el("fieldset");
+    meinungWrap.appendChild(el("legend", {text:"Meine Meinung"}));
+    var meinungCard = el("div", {class:"opinion-card"});
+    meinungCard.appendChild(choiceGroup("q-interesse", "Der Beruf interessiert mich", ["sehr","geht so","gar nicht"], m.interesse, function(val){ m.interesse = val; }));
+    meinungCard.appendChild(choiceGroup("q-faehigkeiten", "Sind meine Fähigkeiten für diesen Beruf geeignet?", ["sehr","geht so","gar nicht"], m.faehigkeiten, function(val){ m.faehigkeiten = val; }));
+    meinungCard.appendChild(choiceGroup("q-team", "Wie war das Team?", ["Ich fühlte mich wohl und akzeptiert.","Der Kontakt war schwierig.","Ich fühlte mich alleine."], m.team, function(val){ m.team = val; }));
+    meinungWrap.appendChild(meinungCard);
+    card.appendChild(meinungWrap);
+
+    card.appendChild(fieldTextarea("Diesen Beruf möchte ich als nächstes schnuppern:", null, a.naechster, function(val){ a.naechster = val; }));
+
+    card.appendChild(buildPageNav("auswertung"));
+    return card;
+  }
+
+  function buildPageNav(id){
+    var idx = sections.findIndex(function(s){ return s.id === id; });
+    var nav = el("div", {class:"page-nav"});
+    var back = el("button", {type:"button", class:"btn", text:"← Zurück"});
+    back.disabled = idx === 0;
+    back.addEventListener("click", function(){ goTo(idx-1); });
+    var next = el("button", {type:"button", class:"btn primary", text:idx === sections.length-1 ? "Fertig" : "Weiter →"});
+    next.addEventListener("click", function(){ if(idx < sections.length-1) goTo(idx+1); });
+    nav.appendChild(back);
+    nav.appendChild(next);
+    return nav;
+  }
+
+  var builders = {
+    vorbereitung: buildVorbereitung,
+    tag1: function(){ return buildTag("tag1","Tag 1"); },
+    tag2: function(){ return buildTag("tag2","Tag 2"); },
+    tag3: function(){ return buildTag("tag3","Tag 3"); },
+    auswertung: buildAuswertung
+  };
+
+  function renderPage(id){
+    var container = document.getElementById("pages");
+    container.innerHTML = "";
+    var page = el("section", {class:"page active", "data-section":id});
+    page.appendChild(builders[id]());
+    container.appendChild(page);
+  }
+
+  function renderTabs(){
+    var nav = document.getElementById("tabs");
+    nav.innerHTML = "";
+    sections.forEach(function(s, i){
+      var tab = el("button", {type:"button", class:"tab" + (i===currentIndex?" active":""), "data-id":s.id});
+      tab.appendChild(el("span", {class:"stamp-dot"}));
+      tab.appendChild(document.createTextNode(s.label));
+      tab.addEventListener("click", function(){ goTo(i); });
+      nav.appendChild(tab);
+    });
+    updateProgress();
+  }
+
+  function goTo(idx){
+    currentIndex = Math.max(0, Math.min(sections.length-1, idx));
+    renderTabs();
+    renderPage(sections[currentIndex].id);
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  // ---------- Print view ----------
+  function esc(s){
+    var d = document.createElement("div");
+    d.textContent = s || "";
+    return d.innerHTML;
+  }
+  function pField(label, value){
+    return '<div class="p-field"><div class="p-label">'+esc(label)+'</div><div class="p-value">'+ (esc(value)||"–") +'</div></div>';
+  }
+  function buildPrintArea(){
+    var v = data.vorbereitung, a = data.auswertung, iv = a.interview, m = a.meinung;
+    var html = "<h1>Schnuppertagebuch</h1>";
+
+    html += "<h2>Vorbereitung</h2>";
+    html += pField("Mein Name", v.meinName);
+    v.betriebe.forEach(function(b, i){
+      html += '<div class="p-field"><div class="p-label">Schnuppereinsatz '+(i+1)+'</div><div class="p-value">'
+        + "Betrieb: " + (esc(b.betrieb)||"–") + "\n"
+        + "Adresse: " + (esc(b.adresse)||"–") + "\n"
+        + "Telefon: " + (esc(b.telefon)||"–") + "\n"
+        + "Beruf: " + (esc(b.beruf)||"–")
+        + "</div></div>";
+    });
+    html += pField("Wann fange ich an?", v.anfang);
+    html += pField("Was muss ich mitnehmen?", v.mitnehmen);
+    html += pField("Recherchen zum Betrieb", v.recherche);
+
+    ["tag1","tag2","tag3"].forEach(function(key, i){
+      var d = data[key];
+      html += "<h2>Tag "+(i+1)+"</h2>";
+      html += pField("Bei diesen Arbeiten war ich dabei:", d.dabei);
+      html += pField("Das hat mir gefallen", d.gefallen);
+      html += pField("Diese Arbeiten durfte ich selber erledigen:", d.selbst);
+      html += pField("Das war nicht so toll:", d.nichtToll);
+      html += pField("Das hat mir Mühe bereitet:", d.muehe);
+      if(d.fotos && d.fotos.length){
+        html += '<div class="p-field"><div class="p-label">Fotos</div><div class="p-photos">';
+        d.fotos.forEach(function(src){ html += '<img src="'+src+'">'; });
+        html += "</div></div>";
+      }
+    });
+
+    html += "<h2>Auswertung</h2>";
+    html += pField("Interview – Name", iv.name);
+    html += pField("Interview – Alter", iv.alter);
+    html += pField("Interview – Funktion im Betrieb", iv.funktion);
+    html += pField("Interview – Wie lange arbeitest du schon hier?", iv.dauer);
+    html += pField("Interview – Was gefällt dir an der Arbeit?", iv.magArbeit);
+    html += pField("Interview – Was gefällt dir am Betrieb?", iv.magBetrieb);
+    html += pField("Interview – Welche Arbeit machst du am liebsten?", iv.liebste);
+    html += pField("Interview – Welche Arbeit machst du nicht so gerne?", iv.ungern);
+    html += pField("Der Beruf interessiert mich", m.interesse);
+    html += pField("Sind meine Fähigkeiten für diesen Beruf geeignet?", m.faehigkeiten);
+    html += pField("Wie war das Team?", m.team);
+    html += pField("Diesen Beruf möchte ich als nächstes schnuppern:", a.naechster);
+
+    document.getElementById("printArea").innerHTML = html;
+  }
+
+  document.getElementById("btnPrint").addEventListener("click", function(){
+    buildPrintArea();
+    window.print();
+  });
+
+  // ---------- Export / Import ----------
+  var SUBMIT_URL = "https://sblch-my.sharepoint.com/:f:/g/personal/rita_sheean_sbl_ch/IgAhEYzJah6nQ4KnhzPke3uoAfHhlIQHum0wzF-K9DNHo-w?e=FS4iIj";
+
+  async function exportJsonFile(){
+    var json = JSON.stringify(data, null, 2);
+    try{
+      var downloads = await claude.use("downloads");
+      if(downloads){
+        try{
+          await downloads.save({filename:"schnuppertagebuch.json", data: json});
+        }catch(err){
+          console.error(err);
+          if(err && err.code === "declined"){ /* Nutzer hat abgelehnt */ }
+          else alert("Die Datei konnte nicht gespeichert werden.");
+        }
+        return;
+      }
+    }catch(e){ /* Capability nicht verfügbar, Fallback unten */ }
+
+    // Fallback: klassischer Browser-Download
+    try{
+      var blob = new Blob([json], {type:"application/json"});
+      var url = URL.createObjectURL(blob);
+      var a2 = document.createElement("a");
+      a2.href = url; a2.download = "schnuppertagebuch.json";
+      document.body.appendChild(a2); a2.click(); document.body.removeChild(a2);
+      URL.revokeObjectURL(url);
+    }catch(e){
+      console.error(e);
+      alert("Sichern als Datei wird von diesem Browser nicht unterstützt.");
+    }
+  }
+
+  document.getElementById("btnExport").addEventListener("click", function(){
+    exportJsonFile();
+  });
+
+  document.getElementById("btnSubmit").addEventListener("click", async function(){
+    await exportJsonFile();
+    window.open(SUBMIT_URL, "_blank", "noopener");
+    alert("Deine Datei wurde heruntergeladen. Im neuen Tab öffnet sich der Abgabe-Ordner – lade die heruntergeladene Datei dort hoch.");
+  });
+
+  document.getElementById("importFile").addEventListener("change", function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        var parsed = JSON.parse(ev.target.result);
+        data = defaultData();
+        loadDataFromObject(parsed);
+        saveData();
+        goTo(currentIndex);
+        alert("Datei geladen.");
+      }catch(err){
+        console.error(err);
+        alert("Diese Datei konnte nicht gelesen werden.");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  });
+
+  function loadDataFromObject(parsed){
+    data.vorbereitung = normalizeVorbereitung(parsed.vorbereitung);
+    ["tag1","tag2","tag3"].forEach(function(k){ data[k] = Object.assign(emptyDay(), parsed[k]||{}); });
+    var av = defaultData().auswertung;
+    data.auswertung = {
+      interview: Object.assign(av.interview, (parsed.auswertung||{}).interview||{}),
+      meinung: Object.assign(av.meinung, (parsed.auswertung||{}).meinung||{}),
+      naechster: (parsed.auswertung||{}).naechster || ""
+    };
+  }
+
+  document.getElementById("btnReset").addEventListener("click", function(){
+    if(confirm("Wirklich alle Einträge löschen? Das kann nicht rückgängig gemacht werden.")){
+      data = defaultData();
+      try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+      document.getElementById("saveStatus").textContent = "Zurückgesetzt.";
+      goTo(0);
+    }
+  });
+
+  // ---------- Init ----------
+  goTo(0);
+})();
+</script>
+</body>
+</html>
